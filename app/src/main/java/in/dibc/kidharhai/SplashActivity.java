@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
-import in.dibc.kidharhai.R;
 
 import in.dibc.kidharhai.utils.Constants;
 
@@ -29,7 +28,8 @@ public class SplashActivity extends AppCompatActivity {
     private static final String TAG = "SplashActivity";
     private ImageView splashImage;
     private String[] locationPermission = {
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
     @Override
@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Constants.checkLocationPermission(this)) {
+            if (Constants.checkLocationPermission(this) && Constants.checkSDWritePermission(this)) {
                 redirect(3000);
             } else {
                 ActivityCompat.requestPermissions(this, locationPermission, 11);
@@ -82,14 +82,14 @@ public class SplashActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
                 redirect(1000);
             } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, locationPermission[0])){
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, locationPermission[0])) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Location Permission");
                     builder.setMessage("It is important to have location permission to function the app properly. Please allow it to access all features");
                     builder.setPositiveButton("GIVE PERMISSION", (dialogInterface, i) -> {
                         ActivityCompat.requestPermissions(this, locationPermission, 11);
                     });
-                    builder.setNegativeButton("DISMISS",  (dialogInterface, i) -> {
+                    builder.setNegativeButton("DISMISS", (dialogInterface, i) -> {
                         finish();
                     });
                     builder.create().show();

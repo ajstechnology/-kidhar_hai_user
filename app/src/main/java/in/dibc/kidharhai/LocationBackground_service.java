@@ -16,6 +16,7 @@
 
 package in.dibc.kidharhai;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +28,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import in.dibc.kidharhai.utils.Constants;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +36,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import in.dibc.kidharhai.utils.Constants;
 
 import static com.google.android.gms.common.api.GoogleApiClient.Builder;
 import static com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -136,13 +141,6 @@ public class LocationBackground_service extends JobService implements
 //        locationRequest.setSmallestDisplacement(1.0f);
         locationRequest.setFastestInterval(10000); // the fastest rate in milliseconds at which your app can handle location updates
 
-       /* locationRequest = LocationRequest.create();
-        // locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(5000); // every 10 second
-        locationRequest.setSmallestDisplacement(50);
-        locationRequest.setFastestInterval(50000); // the fastest rate in milliseconds at which your app can handle location updates*/
-
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, listener);
         } catch (SecurityException e) {
@@ -185,11 +183,17 @@ public class LocationBackground_service extends JobService implements
     protected void sendLocationDataToWebsite() {
         fb_lat = Constants.s_fb_lat;
         fb_lng = Constants.s_fb_lng;
-        //GetJson gs = new GetJson();
-        //AsyncTaskExecutor.executeConcurrently(gs);
         Toast.makeText(getApplicationContext(), "Lat :" + fb_lat + "Lng" + fb_lng, Toast.LENGTH_LONG).show();
         Log.d(TAG, "sendLocationDataToWebsite: " + fb_lat);
         Log.d(TAG, "sendLocationDataToWebsite: " + fb_lng);
+
+        @SuppressLint("SimpleDateFormat") String logString = Constants.s_fb_lat +
+                "," +
+                Constants.s_fb_lng +
+                "@" +
+                new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+        Constants.createLogData(logString);
+
         Constants.sendLocationData(
                 getApplicationContext(),
                 Constants.S_fb_accuracy,

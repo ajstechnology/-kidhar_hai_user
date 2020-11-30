@@ -13,9 +13,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import in.dibc.kidharhai.models.MResLocation;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -75,12 +82,17 @@ public class Constants {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public static boolean checkLocationPermission(Activity activity){
+    public static boolean checkLocationPermission(Activity activity) {
         return activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static boolean isConnectedWithNetwork(Context mContext){
-        ConnectivityManager cm = (ConnectivityManager)  mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public static  boolean checkSDWritePermission(Activity activity) {
+        return activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static boolean isConnectedWithNetwork(Context mContext) {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         @SuppressLint("MissingPermission") NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) { // connected to the internet
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
@@ -88,6 +100,26 @@ public class Constants {
             } else return activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE;
         } else {
             return false;
+        }
+    }
+
+    // Create LogData for Testing purposes
+    public static void createLogData(String data) {
+        File root = android.os.Environment.getExternalStorageDirectory();
+        File dir = new File(root.getAbsolutePath() + "/KidharHai/data/");
+        dir.mkdirs();
+        @SuppressLint("SimpleDateFormat") String filename = new SimpleDateFormat("ddMMyyyy").format(new Date());
+        File file = new File(dir, filename + ".txt");
+
+        try {
+            FileOutputStream f = new FileOutputStream(file, true);
+            PrintWriter pw = new PrintWriter(f);
+            pw.println(data);
+            pw.flush();
+            pw.close();
+            f.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

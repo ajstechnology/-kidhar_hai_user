@@ -1,7 +1,6 @@
 package in.dibc.kidharhai;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,13 +9,12 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import in.dibc.kidharhai.R;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 
 import in.dibc.kidharhai.base.Base;
 import in.dibc.kidharhai.utils.APIService;
 import in.dibc.kidharhai.utils.ApiClient;
 import in.dibc.kidharhai.utils.Constants;
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 
 public class DashboardActivity extends AppCompatActivity implements Base {
     private APIService apiService;
