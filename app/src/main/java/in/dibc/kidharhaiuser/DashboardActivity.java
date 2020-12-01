@@ -1,15 +1,23 @@
 package in.dibc.kidharhaiuser;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.RetryStrategy;
+import com.firebase.jobdispatcher.Trigger;
 
 import in.dibc.kidharhaiuser.base.Base;
 import in.dibc.kidharhaiuser.utils.APIService;
@@ -22,6 +30,7 @@ public class DashboardActivity extends AppCompatActivity implements Base {
 
     private TextView tvSecret;
 
+    // Temp purpose
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +58,23 @@ public class DashboardActivity extends AppCompatActivity implements Base {
 
     @Override
     public void initValues() {
+        jobDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+
         SharedPreferences prefs = getSharedPreferences(Constants.LOGIN_PREFS, MODE_PRIVATE);
         String secretString = prefs.getString(Constants.SECRET, "");
         tvSecret.setText("Your secret key is : " + secretString);
         apiService = ApiClient.getAPIService();
-//        startLocationService();
+
+//        callingServices();
+        startLocationService();
 
 //        updateLocation();
 
     }
 
     private void startLocationService() {
-
+        Intent bgServiceIntent = new Intent(DashboardActivity.this, LocationBackground_serviceQ.class);
+        startService(bgServiceIntent);
     }
 
     @Override
@@ -74,26 +88,35 @@ public class DashboardActivity extends AppCompatActivity implements Base {
     @SuppressLint("DefaultLocale")
     private void updateLocation() {
 
-//        Intent locIntentServ = new Intent(this, LocationBackground_service.class);
-//        startService(locIntentServ);
-//        LocationBackground_service locationBgService = new LocationBackground_service(DashboardActivity.this);
-//
-//        Handler handler = new Handler(Looper.getMainLooper());
-//
-//        handler.postDelayed(() -> {
-//            TimerTask timerTask = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    if (locationBgService.isCanGetLocation()) {
-//                        Constants.s_fb_lat = locationBgService.getLatitude();
-//                        Constants.s_fb_lng = locationBgService.getLongitude();
-//                    }
-//                }
-//            };
-//
-//            Timer timer = new Timer();
-//            timer.schedule(timerTask, 1000, 10000);
-//
-//        }, 1000);
+    }
+
+    public void callingServices() {
+        // Constants.jobDispatcher.cancelAll();
+        final Job.Builder builder = jobDispatcher.newJobBuilder()
+                .setTag("LocationGet")
+                .setRecurring(true)
+                .setLifetime(true ? Lifetime.FOREVER : Lifetime.UNTIL_NEXT_BOOT)
+                .setService(in.dibc.kidharhaiuser.LocationBackground_service.class)
+                .setTrigger(Trigger.executionWindow(0, 90))
+                .setReplaceCurrent(true)
+                .setRetryStrategy(jobDispatcher.newRetryStrategy(RetryStrategy.RETRY_POLICY_EXPONENTIAL, 30, 3600));
+
+
+        if (false) {
+            builder.addConstraint(Constraint.DEVICE_CHARGING);
+        }
+        if (true) {
+            builder.addConstraint(Constraint.ON_ANY_NETWORK);
+        }
+        if (false) {
+            builder.addConstraint(Constraint.ON_UNMETERED_NETWORK);
+        }
+
+        //  Toast.makeText(getApplicationContext(),"Your Tracking successfully activated !!",Toast.LENGTH_LONG).show();
+        Log.i("FJD.JobForm", "scheduling new job");
+        jobDispatcher.mustSchedule(builder.build());
+        //  counter_display=0;
+        // mainss1();
+
     }
 }

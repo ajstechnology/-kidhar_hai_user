@@ -116,7 +116,7 @@ public class Constants {
         File dir = new File(root.getAbsolutePath() + "/KidharHai/data/");
         dir.mkdirs();
 
-        SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd-MM-yyyy HH-mm");
+        SimpleDateFormat timeStampFormat = new SimpleDateFormat("dd-MM-yyyy HH");
         Date GetDate = new Date();
         String DateStr = timeStampFormat.format(GetDate);
         File file = new File(dir,  DateStr + ".txt");

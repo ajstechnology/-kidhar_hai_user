@@ -48,13 +48,13 @@
 
         <service
             android:name="in.dibc.kidharhaiuser.LocationBackground_service"
-            android:exported="false"
-            android:foregroundServiceType="location">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
 
+        <service android:name="in.dibc.kidharhaiuser.LocationBackground_serviceQ" />
     </application>
 
 </manifest>
