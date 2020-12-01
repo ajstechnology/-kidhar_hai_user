@@ -85,6 +85,12 @@ public class Constants {
         return activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public static boolean checkLocationPermissionQ(Activity activity) {
+        return (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                && (activity.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static  boolean checkSDWritePermission(Activity activity) {
         return activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
