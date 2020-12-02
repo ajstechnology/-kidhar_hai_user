@@ -138,7 +138,8 @@ public class LoginActivity extends AppCompatActivity implements Base {
                                     .setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            callingServices();
+//                                            callingServices();
+                                            startLocationService();
                                             startActivity(new Intent(LoginActivity.this, in.dibc.kidharhaiuser.DashboardActivity.class));
                                             finish();
                                         }
@@ -186,6 +187,12 @@ public class LoginActivity extends AppCompatActivity implements Base {
             }
         }
     }
+
+    private void startLocationService() {
+        Intent bgServiceIntent = new Intent(LoginActivity.this, LocationBackground_serviceQ.class);
+        startService(bgServiceIntent);
+    }
+
 
     private void showDlg(String msg) {
         new AlertDialog.Builder(LoginActivity.this)

@@ -66,16 +66,16 @@ public class DashboardActivity extends AppCompatActivity implements Base {
         apiService = ApiClient.getAPIService();
 
 //        callingServices();
-        startLocationService();
+//        startLocationService();
 
 //        updateLocation();
 
     }
 
-    private void startLocationService() {
-        Intent bgServiceIntent = new Intent(DashboardActivity.this, LocationBackground_serviceQ.class);
-        startService(bgServiceIntent);
-    }
+//    private void startLocationService() {
+//        Intent bgServiceIntent = new Intent(DashboardActivity.this, LocationBackground_serviceQ.class);
+//        startService(bgServiceIntent);
+//    }
 
     @Override
     public void setListeners() {

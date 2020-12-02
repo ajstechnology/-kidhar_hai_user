@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -55,8 +54,6 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     //    private GoogleApiClient googleApiClient;
     String latlngJson, json;
     String android_id;
-    double fb_lat = 0.00;
-    double fb_lng = 0.00;
     int b_level;
     String b_status;
     int deviceStatus;
@@ -92,16 +89,10 @@ public class LocationBackground_serviceQ extends Service implements LocationList
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 Location lastLocation = locationResult.getLastLocation();
-                Log.d(TAG, "onLocationResult: lat " + lastLocation.getLatitude());
-                Log.d(TAG, "onLocationResult: lng " + lastLocation.getLongitude());
-                Log.d(TAG, "onLocationResult: time " + System.currentTimeMillis());
-                String latlngData = lastLocation.getLatitude() +
-                        "," +
-                        lastLocation.getLongitude() +
-                        "@" +
-                        new SimpleDateFormat("dd-MM-yyyy HH-mm").format(new Date());
-
-                Constants.createLogData(latlngData);
+                Constants.s_fb_lat = lastLocation.getLatitude();
+                Constants.s_fb_lng = lastLocation.getLongitude();
+                location = locationResult.getLastLocation();
+                sendLocationDataToWebsite();
             }
         };
 
@@ -111,16 +102,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
                 location = getLocation();
 
                 if (location != null) {
-                    Log.d(TAG, "run: lat " + location.getLatitude());
-                    Log.d(TAG, "run: lng " + location.getLongitude());
-
-                    String latlngData = location.getLatitude() +
-                            "," +
-                            location.getLongitude() +
-                            "@" +
-                            new SimpleDateFormat("dd-MM-yyyy HH-mm").format(new Date());
-
-                    Constants.createLogData(latlngData);
+                    sendLocationDataToWebsite();
                 } else {
                     fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, Looper.getMainLooper());
                 }
@@ -143,30 +125,22 @@ public class LocationBackground_serviceQ extends Service implements LocationList
 
 
     protected void sendLocationDataToWebsite() {
-        fb_lat = Constants.s_fb_lat;
-        fb_lng = Constants.s_fb_lng;
-        Toast.makeText(getApplicationContext(), "Lat :" + fb_lat + "Lng" + fb_lng, Toast.LENGTH_LONG).show();
-        Log.d(TAG, "sendLocationDataToWebsite: " + fb_lat);
-        Log.d(TAG, "sendLocationDataToWebsite: " + fb_lng);
-
         @SuppressLint("SimpleDateFormat") String logString = Constants.s_fb_lat +
                 "," +
                 Constants.s_fb_lng + Constants.S_fb_accuracy +
                 "@" +
-                new SimpleDateFormat("dd-MM-yyyy HH-mm").format(new Date());
+                new SimpleDateFormat("dd-MM-yyyy HH").format(new Date());
         Constants.createLogData(logString);
         Constants.sendLocationData(
                 getApplicationContext(),
                 Constants.S_fb_accuracy,
                 Constants.s_fb_altitude,
-                "96.486",
+                String.valueOf(location.getAccuracy()),
                 "96.486",
                 Constants.s_fb_lat,
                 Constants.s_fb_lng,
-                "23"
+                String.valueOf(location.getSpeed())
         );
-
-        stopSelf();
     }
 
     private void batteryLevel() throws Exception {

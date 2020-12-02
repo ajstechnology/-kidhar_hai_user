@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:inputType="number"
                 android:maxLength="5"
-                android:imeOptions="actionNext"
+                android:imeOptions="actionDone"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
