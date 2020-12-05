@@ -27,10 +27,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -65,7 +68,6 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     private LocationCallback locationCallback;
 
     // Location Manager APIs
-
     private boolean isGPSEnabled = false;
     private boolean isNetworkEnabled = false;
 
@@ -91,6 +93,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
                 Location lastLocation = locationResult.getLastLocation();
                 Constants.s_fb_lat = lastLocation.getLatitude();
                 Constants.s_fb_lng = lastLocation.getLongitude();
+                Constants.S_fb_accuracy = lastLocation.getAccuracy();
                 location = locationResult.getLastLocation();
                 sendLocationDataToWebsite();
             }
@@ -102,6 +105,9 @@ public class LocationBackground_serviceQ extends Service implements LocationList
                 location = getLocation();
 
                 if (location != null) {
+                    Constants.s_fb_lat = location.getLatitude();
+                    Constants.s_fb_lng = location.getLongitude();
+                    Constants.S_fb_accuracy = location.getAccuracy();
                     sendLocationDataToWebsite();
                 } else {
                     fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, Looper.getMainLooper());
@@ -125,11 +131,12 @@ public class LocationBackground_serviceQ extends Service implements LocationList
 
 
     protected void sendLocationDataToWebsite() {
+        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getApplicationContext(), String.format("Lat: %s\nLng: %s", Constants.s_fb_lat, Constants.s_fb_lng), Toast.LENGTH_SHORT).show());
         @SuppressLint("SimpleDateFormat") String logString = Constants.s_fb_lat +
                 "," +
-                Constants.s_fb_lng + Constants.S_fb_accuracy +
-                "@" +
-                new SimpleDateFormat("dd-MM-yyyy HH").format(new Date());
+                Constants.s_fb_lng + "@accuracy: " + Constants.S_fb_accuracy +
+                "@time: " +
+                new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(new Date());
         Constants.createLogData(logString);
         Constants.sendLocationData(
                 getApplicationContext(),
