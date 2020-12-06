@@ -28,6 +28,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -199,6 +200,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     @Override
     public void onTaskRemoved(Intent rootIntent) {
 
+
         Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
         restartServiceIntent.setPackage(getPackageName());
 
@@ -224,12 +226,18 @@ public class LocationBackground_serviceQ extends Service implements LocationList
         super.onDestroy();
         Log.d(TAG, "onDestroy: service stopped");
 
-        // Works upto android 7
-        // Restart the service itself after killed form Background
-        new Handler().postDelayed(() -> {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             Intent intent = new Intent(getApplicationContext(), LocationBackground_serviceQ.class);
-            startService(intent);
-        }, 3000);
+            startForegroundService(intent);
+        } else {
+            // Works upto android 7
+            // Restart the service itself after killed form Background
+            new Handler().postDelayed(() -> {
+                Intent intent = new Intent(getApplicationContext(), LocationBackground_serviceQ.class);
+                startService(intent);
+            }, 3000);
+        }
     }
 
     @Nullable

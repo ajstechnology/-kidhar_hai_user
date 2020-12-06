@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -78,7 +79,7 @@ public class SplashActivity extends AppCompatActivity {
         Log.d(TAG, "redirect: authKey => " + authKey);
         Log.d(TAG, "redirect: secret => " + secret);
 
-        new Handler().postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (authKey == null || secret == null) {
                 Intent loginIntent = new Intent(SplashActivity.this, in.dibc.kidharhaiuser.LoginActivity.class);
                 startActivity(loginIntent);
