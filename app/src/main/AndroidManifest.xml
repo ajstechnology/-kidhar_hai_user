@@ -55,6 +55,15 @@
         </service>
 
         <service android:name="in.dibc.kidharhaiuser.LocationBackground_serviceQ" />
+
+        <receiver
+            android:name=".receivers.LocReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="StartLocationService" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

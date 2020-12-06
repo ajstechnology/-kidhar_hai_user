@@ -17,6 +17,8 @@
 package in.dibc.kidharhaiuser;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,10 +32,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -195,6 +197,22 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(
+                AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + 1000,
+                restartServicePendingIntent);
+
+        super.onTaskRemoved(rootIntent);
+    }
+
+    @Override
     public void onDestroy() {
 
         try {
@@ -204,7 +222,14 @@ public class LocationBackground_serviceQ extends Service implements LocationList
 
         }
         super.onDestroy();
+        Log.d(TAG, "onDestroy: service stopped");
 
+        // Works upto android 7
+        // Restart the service itself after killed form Background
+        new Handler().postDelayed(() -> {
+            Intent intent = new Intent(getApplicationContext(), LocationBackground_serviceQ.class);
+            startService(intent);
+        }, 3000);
     }
 
     @Nullable

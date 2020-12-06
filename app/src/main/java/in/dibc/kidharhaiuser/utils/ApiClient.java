@@ -17,7 +17,7 @@ public class ApiClient {
         return new Retrofit.Builder()
                 .baseUrl("https://kidharhai.in")
                 .addConverterFactory(MoshiConverterFactory.create())
-                .client(client.build())
+//                .client(client.build())
                 .build().create(APIService.class);
     }
 }
