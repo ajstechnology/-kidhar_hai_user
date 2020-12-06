@@ -18,12 +18,16 @@ package in.dibc.kidharhaiuser;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -38,7 +42,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
+import com.firebase.jobdispatcher.BuildConfig;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -120,6 +127,11 @@ public class LocationBackground_serviceQ extends Service implements LocationList
 
         Timer timer = new Timer();
         timer.schedule(task, 1000, 10000);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService();
+        }
+
         return START_STICKY;
     }
 
@@ -227,9 +239,8 @@ public class LocationBackground_serviceQ extends Service implements LocationList
         Log.d(TAG, "onDestroy: service stopped");
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            Intent intent = new Intent(getApplicationContext(), LocationBackground_serviceQ.class);
-            startForegroundService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService();
         } else {
             // Works upto android 7
             // Restart the service itself after killed form Background
@@ -238,6 +249,27 @@ public class LocationBackground_serviceQ extends Service implements LocationList
                 startService(intent);
             }, 3000);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void startForegroundService() {
+        String NOTIFICATION_CHANNEL_ID = BuildConfig.APPLICATION_ID;
+        String channelName = "LocService";
+        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        channel.setLightColor(Color.BLUE);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(channel);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setContentTitle("App is running in background")
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
+        startForeground(2, notification);
     }
 
     @Nullable
