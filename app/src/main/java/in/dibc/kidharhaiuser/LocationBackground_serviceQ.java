@@ -96,6 +96,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Constants.createLogData("Location service started...");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
             @Override
@@ -237,6 +238,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
         }
         super.onDestroy();
         Log.d(TAG, "onDestroy: service stopped");
+        Constants.createLogData("Location service destroyed...");
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

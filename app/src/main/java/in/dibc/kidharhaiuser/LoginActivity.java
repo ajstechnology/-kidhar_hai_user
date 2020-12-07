@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements Base {
 
     @Override
     public void initValues() {
-
+        Constants.createLogData("Login screen started...");
         Glide.with(LoginActivity.this).load(R.drawable.logo).into(imgHeader);
 
         gotOTP = false;

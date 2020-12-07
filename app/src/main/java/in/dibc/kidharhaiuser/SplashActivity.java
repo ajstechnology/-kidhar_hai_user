@@ -50,23 +50,30 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
+        Constants.createLogData("SplashActivity started");
+
         splashImage = findViewById(R.id.splash_image);
         Glide.with(SplashActivity.this).load(R.drawable.logo).into(splashImage);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             if (Constants.checkLocationPermission(this) && Constants.checkSDWritePermission(this)) {
+                Constants.createLogData("SplashActivity redirection on version code >= M && <=Q");
                 redirect(3000);
             } else {
+                Constants.createLogData("SplashActivity request for version code >= M && <=Q");
                 ActivityCompat.requestPermissions(this, locationPermission, REQ_PERMISSION);
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (Constants.checkLocationPermissionQ(this) && Constants.checkSDWritePermission(this)) {
+                Constants.createLogData("SplashActivity redirection on version code >= Q");
                 redirect(3000);
             } else {
+                Constants.createLogData("SplashActivity request for version code >= Q");
                 ActivityCompat.requestPermissions(this, locationPermissionQ, REQ_PERMISSION_Q);
             }
         } else {
+            Constants.createLogData("SplashActivity redirection on version code >= L");
             redirect(3000);
         }
     }
@@ -97,17 +104,21 @@ public class SplashActivity extends AppCompatActivity {
         switch (requestCode){
             case REQ_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Constants.createLogData("SplashActivity permission granted [checked test]");
                     Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
                     redirect(1000);
                 } else {
+                    Constants.createLogData("SplashActivity rationale permission dialog");
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this, locationPermission[0])) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setTitle("Location Permission");
                         builder.setMessage("It is important to have location permission to function the app properly. Please allow it to access all features");
                         builder.setPositiveButton("GIVE PERMISSION", (dialogInterface, i) -> {
                             ActivityCompat.requestPermissions(this, locationPermission, 11);
+                            Constants.createLogData("SplashActivity rationale permission revoked");
                         });
                         builder.setNegativeButton("DISMISS", (dialogInterface, i) -> {
+                            Constants.createLogData("SplashActivity rationale permission dismissed");
                             finish();
                         });
                         builder.create().show();
@@ -115,6 +126,7 @@ public class SplashActivity extends AppCompatActivity {
                 }
                 break;
             case REQ_PERMISSION_Q:
+                Constants.createLogData("SplashActivity req permission for Q support");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
                     redirect(1000);
@@ -124,9 +136,11 @@ public class SplashActivity extends AppCompatActivity {
                         builder.setTitle("Location Permission");
                         builder.setMessage("It is important to have location permission to function the app properly. Please allow it to access all features");
                         builder.setPositiveButton("GIVE PERMISSION", (dialogInterface, i) -> {
+                            Constants.createLogData("SplashActivity rationale permission revoked");
                             ActivityCompat.requestPermissions(this, locationPermissionQ, 11);
                         });
                         builder.setNegativeButton("DISMISS", (dialogInterface, i) -> {
+                            Constants.createLogData("SplashActivity rationale permission dismissed");
                             finish();
                         });
                         builder.create().show();
