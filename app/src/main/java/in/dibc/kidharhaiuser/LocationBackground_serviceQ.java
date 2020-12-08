@@ -88,8 +88,8 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     private double latitude;
     private double longitude;
 
-    private static final long MIN_DISTANCE = 10;    // 10 Meters distance
-    private static final long MIN_TIME = 1000;      // 1 Sec interval
+    private static final long MIN_DISTANCE = 1;    // 10 Meters distance
+    private static final long MIN_TIME = 1;      // 1 Sec interval
 
     private LocationManager locationManager;
 
