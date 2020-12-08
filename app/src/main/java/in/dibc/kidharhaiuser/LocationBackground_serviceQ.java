@@ -17,11 +17,9 @@
 package in.dibc.kidharhaiuser;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,7 +35,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -89,7 +86,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     private double longitude;
 
     private static final long MIN_DISTANCE = 1;    // 10 Meters distance
-    private static final long MIN_TIME = 1;      // 1 Sec interval
+    private static final long MIN_TIME = 1000;      // 1 Sec interval
 
     private LocationManager locationManager;
 
@@ -127,7 +124,7 @@ public class LocationBackground_serviceQ extends Service implements LocationList
         };
 
         Timer timer = new Timer();
-        timer.schedule(task, 1000, 10000);
+        timer.schedule(task, 0, 10000);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService();
@@ -211,23 +208,6 @@ public class LocationBackground_serviceQ extends Service implements LocationList
     }
 
     @Override
-    public void onTaskRemoved(Intent rootIntent) {
-
-
-        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-
-        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        alarmService.set(
-                AlarmManager.ELAPSED_REALTIME,
-                SystemClock.elapsedRealtime() + 1000,
-                restartServicePendingIntent);
-
-        super.onTaskRemoved(rootIntent);
-    }
-
-    @Override
     public void onDestroy() {
 
         try {
@@ -241,15 +221,13 @@ public class LocationBackground_serviceQ extends Service implements LocationList
         Constants.createLogData("Location service destroyed...");
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService();
-        } else {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             // Works upto android 7
             // Restart the service itself after killed form Background
             new Handler().postDelayed(() -> {
                 Intent intent = new Intent(getApplicationContext(), LocationBackground_serviceQ.class);
                 startService(intent);
-            }, 3000);
+            }, 10000);
         }
     }
 
