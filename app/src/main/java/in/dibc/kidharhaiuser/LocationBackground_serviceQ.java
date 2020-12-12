@@ -151,16 +151,22 @@ public class LocationBackground_serviceQ extends Service implements LocationList
                 "@time: " +
                 new SimpleDateFormat("dd-MM-yyyy HH-mm-ss").format(new Date());
         Constants.createLogData(logString);
-        Constants.sendLocationData(
-                getApplicationContext(),
-                Constants.S_fb_accuracy,
-                Constants.s_fb_altitude,
-                String.valueOf(location.getAccuracy()),
-                "96.486",
-                Constants.s_fb_lat,
-                Constants.s_fb_lng,
-                String.valueOf(location.getSpeed())
-        );
+
+        if (Constants.isConnectedWithNetwork(this)) {
+            Constants.createLogData("Internet available");
+            Constants.sendLocationData(
+                    getApplicationContext(),
+                    Constants.S_fb_accuracy,
+                    Constants.s_fb_altitude,
+                    String.valueOf(location.getAccuracy()),
+                    "96.486",
+                    Constants.s_fb_lat,
+                    Constants.s_fb_lng,
+                    String.valueOf(location.getSpeed())
+            );
+        } else {
+            Constants.createLogData("Internet not available");
+        }
     }
 
     private void batteryLevel() throws Exception {

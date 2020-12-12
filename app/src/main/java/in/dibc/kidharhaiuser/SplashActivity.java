@@ -56,25 +56,31 @@ public class SplashActivity extends AppCompatActivity {
         Glide.with(SplashActivity.this).load(R.drawable.logo).into(splashImage);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            if (Constants.checkLocationPermission(this) && Constants.checkSDWritePermission(this)) {
-                Constants.createLogData("SplashActivity redirection on version code >= M && <=Q");
-                redirect(3000);
+        if(Constants.isConnectedWithNetwork(this)) {
+            Constants.createLogData("Internet connected");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (Constants.checkLocationPermission(this) && Constants.checkSDWritePermission(this)) {
+                    Constants.createLogData("SplashActivity redirection on version code >= M && <=Q");
+                    redirect(3000);
+                } else {
+                    Constants.createLogData("SplashActivity request for version code >= M && <=Q");
+                    ActivityCompat.requestPermissions(this, locationPermission, REQ_PERMISSION);
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (Constants.checkLocationPermissionQ(this) && Constants.checkSDWritePermission(this)) {
+                    Constants.createLogData("SplashActivity redirection on version code >= Q");
+                    redirect(3000);
+                } else {
+                    Constants.createLogData("SplashActivity request for version code >= Q");
+                    ActivityCompat.requestPermissions(this, locationPermissionQ, REQ_PERMISSION_Q);
+                }
             } else {
-                Constants.createLogData("SplashActivity request for version code >= M && <=Q");
-                ActivityCompat.requestPermissions(this, locationPermission, REQ_PERMISSION);
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (Constants.checkLocationPermissionQ(this) && Constants.checkSDWritePermission(this)) {
-                Constants.createLogData("SplashActivity redirection on version code >= Q");
+                Constants.createLogData("SplashActivity redirection on version code >= L");
                 redirect(3000);
-            } else {
-                Constants.createLogData("SplashActivity request for version code >= Q");
-                ActivityCompat.requestPermissions(this, locationPermissionQ, REQ_PERMISSION_Q);
             }
         } else {
-            Constants.createLogData("SplashActivity redirection on version code >= L");
-            redirect(3000);
+            Toast.makeText(this, "You're not connected", Toast.LENGTH_SHORT).show();
+            Constants.createLogData("Internet not connected");
         }
     }
 

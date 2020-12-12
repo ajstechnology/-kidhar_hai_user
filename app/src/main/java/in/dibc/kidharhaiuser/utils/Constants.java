@@ -66,8 +66,10 @@ public class Constants {
                 if (response.isSuccessful() && response.body() != null) {
 //                    showDlg(response.body().getMessage());
                     Log.d(TAG, "onResponse: " + response.body().getMessage());
+                    Constants.createLogData(response.body().getMessage());
                 } else {
 //                    showDlg("Failed to send data");
+                    Constants.createLogData("Failed to send data");
                 }
             }
 
@@ -75,7 +77,7 @@ public class Constants {
             public void onFailure(@NonNull Call<MResLocation> call, @NonNull Throwable t) {
 //                showDlg("Something went wrong. Failed to send data");
                 Log.d(TAG, "onFailure: " + t.getMessage());
-
+                Constants.createLogData(t.getMessage());
             }
         });
     }
